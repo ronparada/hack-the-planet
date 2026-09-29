@@ -19,8 +19,28 @@
   --shadow: 0 0 0 1px rgba(134, 255, 215, 0.2), 0 30px 80px rgba(0, 0, 0, 0.45);
 }
 
+section[id] {
+  scroll-margin-top: 7rem;
+}
+
 * {
   box-sizing: border-box;
+}
+
+.skip-link {
+  position: fixed;
+  top: -5rem;
+  left: 1rem;
+  z-index: 110;
+  padding: 0.75rem 1rem;
+  border: 1px solid var(--green);
+  border-radius: 0.7rem;
+  background: var(--bg-2);
+  color: var(--text);
+}
+
+.skip-link:focus {
+  top: 1rem;
 }
 
 html {
@@ -62,6 +82,15 @@ a {
 
 button {
   cursor: pointer;
+}
+
+a:focus-visible,
+button:focus-visible,
+input:focus-visible,
+section[id]:focus-visible,
+main:focus-visible {
+  outline: 3px solid var(--yellow);
+  outline-offset: 3px;
 }
 
 img {
@@ -152,6 +181,7 @@ img {
 
 .nav-link,
 .menu-toggle {
+  min-height: 44px;
   padding: 0.55rem 0.8rem;
   font-size: 0.75rem;
   letter-spacing: 0.05rem;
@@ -170,6 +200,7 @@ img {
 
 .primary-button,
 .secondary-button {
+  min-height: 44px;
   padding: 0.8rem 1.1rem;
   font-weight: 700;
 }
@@ -501,6 +532,7 @@ img {
 }
 
 .quiz-option {
+  min-height: 44px;
   padding: 0.8rem 1rem;
   text-align: left;
 }
@@ -541,6 +573,7 @@ img {
 .console-form input {
   flex: 1 1 auto;
   min-width: 0;
+  min-height: 44px;
   border: 1px solid rgba(122, 245, 211, 0.25);
   border-radius: 10px;
   background: rgba(7, 16, 24, 0.7);
@@ -587,6 +620,7 @@ img {
 }
 
 .boot-skip {
+  min-height: 44px;
   margin-top: 1rem;
   padding: 0.75rem 1rem;
   border: 1px solid rgba(122, 245, 211, 0.5);

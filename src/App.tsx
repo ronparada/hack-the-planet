@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import {
   aliasParts,
   bootLines,
@@ -21,9 +21,13 @@ const randomAlias = () => {
 };
 
 function App() {
-  const [bootComplete, setBootComplete] = useState(false);
+  const [bootComplete, setBootComplete] = useState(
+    () => window.matchMedia('(prefers-reduced-motion: reduce)').matches
+  );
   const [menuOpen, setMenuOpen] = useState(false);
-  const [reduceEffects, setReduceEffects] = useState(false);
+  const [reduceEffects, setReduceEffects] = useState(
+    () => window.matchMedia('(prefers-reduced-motion: reduce)').matches
+  );
   const [alias, setAlias] = useState(randomAlias);
   const [quizIndex, setQuizIndex] = useState(0);
   const [selectedAnswers, setSelectedAnswers] = useState<Record<string, string>>({});
@@ -31,32 +35,55 @@ function App() {
   const [terminalLines, setTerminalLines] = useState<string[]>([
     'ACCESS GRANTED. Type "help" to inspect the archive.'
   ]);
+  const menuToggleRef = useRef<HTMLButtonElement>(null);
 
   const currentQuestion = quizQuestions[quizIndex];
 
   useEffect(() => {
     const mediaQuery = window.matchMedia('(prefers-reduced-motion: reduce)');
-    const syncReduceMotion = () => setReduceEffects(mediaQuery.matches);
+    const syncReduceMotion = () => {
+      setReduceEffects(mediaQuery.matches);
+      if (mediaQuery.matches) {
+        setBootComplete(true);
+      }
+    };
 
     syncReduceMotion();
     mediaQuery.addEventListener('change', syncReduceMotion);
 
-    const bootTimer = window.setTimeout(() => {
-      setBootComplete(true);
-    }, 2200);
+    const bootTimer = mediaQuery.matches
+      ? undefined
+      : window.setTimeout(() => setBootComplete(true), 2200);
 
     return () => {
       mediaQuery.removeEventListener('change', syncReduceMotion);
-      window.clearTimeout(bootTimer);
+      if (bootTimer !== undefined) {
+        window.clearTimeout(bootTimer);
+      }
     };
   }, []);
 
-  const displayAlias = useMemo(() => alias, [alias]);
+  useEffect(() => {
+    if (!menuOpen) {
+      return;
+    }
+
+    const closeOnEscape = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') {
+        setMenuOpen(false);
+        menuToggleRef.current?.focus();
+      }
+    };
+
+    window.addEventListener('keydown', closeOnEscape);
+    return () => window.removeEventListener('keydown', closeOnEscape);
+  }, [menuOpen]);
 
   const scrollToSection = (sectionId: string) => {
     const section = document.getElementById(sectionId);
     if (section) {
       section.scrollIntoView({ behavior: reduceEffects ? 'auto' : 'smooth', block: 'start' });
+      section.focus({ preventScroll: true });
     }
     setMenuOpen(false);
   };
@@ -98,6 +125,7 @@ function App() {
       setQuizIndex((previous) => previous + 1);
     } else {
       setQuizIndex(0);
+      setSelectedAnswers({});
     }
   };
 
@@ -114,12 +142,15 @@ function App() {
 
   return (
     <div className={`site-shell ${reduceEffects ? 'reduced-motion' : ''}`}>
+      <a className="skip-link" href="#main-content">Skip to content</a>
       {!bootComplete && (
-        <div className="boot-overlay" aria-live="polite">
-          <div className="boot-window" role="status">
-            {bootLines.map((line) => (
-              <p key={line}>{line}</p>
-            ))}
+        <div className="boot-overlay">
+          <div className="boot-window">
+            <div role="status" aria-live="polite">
+              {bootLines.map((line) => (
+                <p key={line}>{line}</p>
+              ))}
+            </div>
             <button type="button" className="boot-skip" onClick={() => setBootComplete(true)}>
               Skip Boot Sequence
             </button>
@@ -137,13 +168,15 @@ function App() {
         </div>
 
         <button
+          ref={menuToggleRef}
           type="button"
           className="menu-toggle"
           onClick={() => setMenuOpen((previous) => !previous)}
           aria-expanded={menuOpen}
           aria-controls="main-navigation"
+          aria-label={menuOpen ? 'Close navigation menu' : 'Open navigation menu'}
         >
-          Menu
+          {menuOpen ? 'Close menu' : 'Menu'}
         </button>
 
         <nav id="main-navigation" className={`primary-nav ${menuOpen ? 'open' : ''}`} aria-label="Main navigation">
@@ -151,8 +184,8 @@ function App() {
         </nav>
       </header>
 
-      <main className="page-shell">
-        <section id="home" className="hero panel">
+      <main id="main-content" className="page-shell" tabIndex={-1}>
+        <section id="home" className="hero panel" tabIndex={-1}>
           <div className="hero-copy">
             <p className="eyebrow">UNOFFICIAL DIGITAL TIME CAPSULE</p>
             <h1>HACK THE PLANET</h1>
@@ -163,7 +196,12 @@ function App() {
               <button type="button" className="primary-button" onClick={() => scrollToSection('movie')}>
                 Enter the Archive
               </button>
-              <button type="button" className="secondary-button" onClick={() => setReduceEffects((previous) => !previous)}>
+              <button
+                type="button"
+                className="secondary-button"
+                aria-pressed={reduceEffects}
+                onClick={() => setReduceEffects((previous) => !previous)}
+              >
                 {reduceEffects ? 'Restore Effects' : 'Reduce Effects'}
               </button>
             </div>
@@ -187,7 +225,7 @@ function App() {
           </div>
         </section>
 
-        <section id="movie" className="content-section panel">
+        <section id="movie" className="content-section panel" tabIndex={-1}>
           <div className="section-heading">
             <p className="eyebrow">The Movie</p>
             <h2>Why this film still feels like a warning siren from the future.</h2>
@@ -237,7 +275,7 @@ function App() {
           </div>
         </section>
 
-        <section id="characters" className="content-section panel">
+        <section id="characters" className="content-section panel" tabIndex={-1}>
           <div className="section-heading">
             <p className="eyebrow">Meet the Hackers</p>
             <h2>Classified dossiers from the underground.</h2>
@@ -275,7 +313,7 @@ function App() {
           </div>
         </section>
 
-        <section id="gibson" className="content-section panel">
+        <section id="gibson" className="content-section panel" tabIndex={-1}>
           <div className="section-heading">
             <p className="eyebrow">The Gibson Files</p>
             <h2>Case files from a fictional security archive.</h2>
@@ -295,7 +333,7 @@ function App() {
           </p>
         </section>
 
-        <section id="compare" className="content-section panel">
+        <section id="compare" className="content-section panel" tabIndex={-1}>
           <div className="section-heading">
             <p className="eyebrow">1995 vs. Today</p>
             <h2>From dial-up theater to real-world defense.</h2>
@@ -315,7 +353,7 @@ function App() {
           </div>
         </section>
 
-        <section id="sound" className="content-section panel split-layout">
+        <section id="sound" className="content-section panel split-layout" tabIndex={-1}>
           <div>
             <div className="section-heading">
               <p className="eyebrow">Sound and Style</p>
@@ -343,7 +381,7 @@ function App() {
           </div>
         </section>
 
-        <section id="legacy" className="content-section panel">
+        <section id="legacy" className="content-section panel" tabIndex={-1}>
           <div className="section-heading">
             <p className="eyebrow">Legacy</p>
             <h2>The movie still matters for the stories we tell about code and rebellion.</h2>
@@ -356,7 +394,7 @@ function App() {
           </p>
         </section>
 
-        <section id="links" className="content-section panel">
+        <section id="links" className="content-section panel" tabIndex={-1}>
           <div className="section-heading">
             <p className="eyebrow">Curated Link Directory</p>
             <h2>Useful references, archives, and security resources.</h2>
@@ -386,7 +424,7 @@ function App() {
           </div>
         </section>
 
-        <section id="about" className="content-section panel">
+        <section id="about" className="content-section panel" tabIndex={-1}>
           <div className="section-heading">
             <p className="eyebrow">About This Project</p>
             <h2>Made for curiosity, education, and a love of 1990s imagination.</h2>
@@ -397,7 +435,7 @@ function App() {
           <div className="utility-row">
             <div className="alias-box">
               <p className="small-label">Alias generator</p>
-              <h3>{displayAlias}</h3>
+              <h3>{alias}</h3>
               <button type="button" className="secondary-button" onClick={() => setAlias(randomAlias())}>
                 Generate Handle
               </button>
@@ -406,12 +444,13 @@ function App() {
             <div className="quiz-box">
               <p className="small-label">1995 technology quiz</p>
               <h3>{currentQuestion.prompt}</h3>
-              <div className="quiz-options">
+              <div className="quiz-options" role="group" aria-label={`Answers for ${currentQuestion.prompt}`}>
                 {currentQuestion.options.map((option) => (
                   <button
                     type="button"
                     key={option}
                     className={`quiz-option ${selectedAnswers[currentQuestion.id] === option ? 'selected' : ''}`}
+                    aria-pressed={selectedAnswers[currentQuestion.id] === option}
                     onClick={() => handleAnswer(option)}
                   >
                     {option}
@@ -419,7 +458,7 @@ function App() {
                 ))}
               </div>
               {selectedAnswers[currentQuestion.id] && (
-                <div className="quiz-feedback">
+                <div className="quiz-feedback" role="status">
                   <p>
                     {selectedAnswers[currentQuestion.id] === currentQuestion.correct
                       ? 'Correct.'
@@ -436,7 +475,7 @@ function App() {
           </div>
         </section>
 
-        <section className="content-section panel terminal-panel">
+        <section className="content-section panel terminal-panel" tabIndex={-1}>
           <div className="section-heading">
             <p className="eyebrow">Terminal Command Interface</p>
             <h2>Type a safe command into the archive.</h2>
