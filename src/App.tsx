@@ -260,10 +260,10 @@ function App() {
                   <li>
                     Actor:{' '}
                     <a
-                      href={character.actorReference.url}
+                      href={character.actorReference}
                       target="_blank"
                       rel="noopener noreferrer"
-                      aria-label={`${character.actor}, cast reference for Hackers (opens in a new tab)`}
+                      aria-label={`${character.actor} biography (opens in a new tab)`}
                     >
                       {character.actor}
                     </a>

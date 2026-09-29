@@ -39,6 +39,14 @@ export const references = {
   imdb: {
     label: 'IMDb: Hackers',
     url: 'https://www.imdb.com/title/tt0113243/'
+  },
+  actors: {
+    jonnyLeeMiller: 'https://en.wikipedia.org/wiki/Jonny_Lee_Miller',
+    angelinaJolie: 'https://en.wikipedia.org/wiki/Angelina_Jolie',
+    matthewLillard: 'https://en.wikipedia.org/wiki/Matthew_Lillard',
+    renolySantiago: 'https://en.wikipedia.org/wiki/Renoly_Santiago',
+    laurenceMason: 'https://en.wikipedia.org/wiki/Laurence_Mason',
+    fisherStevens: 'https://en.wikipedia.org/wiki/Fisher_Stevens'
   }
 };
 
@@ -68,7 +76,7 @@ export const characters = [
     name: 'Dade Murphy',
     alias: 'Crash Override',
     actor: 'Jonny Lee Miller',
-    actorReference: references.film,
+    actorReference: references.actors.jonnyLeeMiller,
     role: 'Lead hacker / prodigy',
     trait: 'Chaotic genius',
     accessLevel: 'Level 9',
@@ -78,7 +86,7 @@ export const characters = [
     name: 'Kate Libby',
     alias: 'Acid Burn',
     actor: 'Angelina Jolie',
-    actorReference: references.film,
+    actorReference: references.actors.angelinaJolie,
     role: 'Elite codebreaker',
     trait: 'Pride with precision',
     accessLevel: 'Level 8',
@@ -88,7 +96,7 @@ export const characters = [
     name: 'Cereal Killer',
     alias: 'Cereal Killer',
     actor: 'Matthew Lillard',
-    actorReference: references.film,
+    actorReference: references.actors.matthewLillard,
     role: 'Digital mischief maker',
     trait: 'Chaotic energy',
     accessLevel: 'Level 6',
@@ -98,7 +106,7 @@ export const characters = [
     name: 'Phantom Phreak',
     alias: 'Phantom Phreak',
     actor: 'Renoly Santiago',
-    actorReference: references.film,
+    actorReference: references.actors.renolySantiago,
     role: 'Phone phreak / insider',
     trait: 'Streetwise talent',
     accessLevel: 'Level 6',
@@ -108,7 +116,7 @@ export const characters = [
     name: 'Lord Nikon',
     alias: 'Lord Nikon',
     actor: 'Laurence Mason',
-    actorReference: references.film,
+    actorReference: references.actors.laurenceMason,
     role: 'Hacker / crew member',
     trait: 'Stylish menace',
     accessLevel: 'Level 5',
@@ -118,7 +126,7 @@ export const characters = [
     name: 'Eugene Belford',
     alias: 'The Plague',
     actor: 'Fisher Stevens',
-    actorReference: references.film,
+    actorReference: references.actors.fisherStevens,
     role: 'Corporate antagonist',
     trait: 'Arrogant architect',
     accessLevel: 'Level 4',
